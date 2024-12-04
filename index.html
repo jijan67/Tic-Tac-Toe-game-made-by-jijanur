@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JIJANUR-Tic-Tac-Toe</title>
+    <style>
+        body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: linear-gradient(to bottom right, #4CAF50, #2196F3);
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #fff;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+h1 {
+    font-size: 24px;
+}
+
+.board {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    margin-top: 20px;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    background-color: #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.cell.winner {
+    animation: celebration 0.5s ease infinite;
+}
+
+@keyframes celebration {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+p#message {
+    margin-top: 20px;
+    font-size: 18px;
+}
+
+button#reset-button {
+    display: none;
+    margin-top: 20px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+button#reset-button:hover {
+    background-color: #0056b3;
+}
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Tic-Tac-Toe</h1>
+        <div class="board" id="board">
+            <!-- The game board will be generated here using JavaScript -->
+        </div>
+        <p id="message"></p>
+        <button id="reset-button">New Game</button>
+    </div>
+    <script>
+        const board = document.getElementById('board');
+const message = document.getElementById('message');
+const resetButton = document.getElementById('reset-button');
+const cells = [];
+
+let currentPlayer = 'X';
+let moves = 0;
+let gameWon = false;
+
+// Create the game board
+for (let i = 0; i < 9; i++) {
+    const cell = document.createElement('div');
+    cell.classList.add('cell');
+    cells.push(cell);
+    cell.dataset.index = i;
+    cell.addEventListener('click', handleCellClick);
+    board.appendChild(cell);
+}
+
+function handleCellClick(e) {
+    const cell = e.target;
+    if (cell.textContent || gameWon) return;
+
+    cell.textContent = currentPlayer;
+    moves++;
+    if (checkWin()) {
+        gameWon = true;
+    } else if (moves === 9) {
+        message.textContent = "It's a draw!";
+        // Display the new game button
+        resetButton.style.display = 'block';
+    } else {
+        currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
+        message.textContent = `Player ${currentPlayer}'s turn`;
+    }
+}
+
+function checkWin() {
+    const winningCombos = [
+        [0, 1, 2],
+        [3, 4, 5],
+        [6, 7, 8],
+        [0, 3, 6],
+        [1, 4, 7],
+        [2, 5, 8],
+        [0, 4, 8],
+        [2, 4, 6],
+    ];
+
+    let hasWinner = false;
+
+    for (const combo of winningCombos) {
+        const [a, b, c] = combo;
+        if (cells[a].textContent && cells[a].textContent === cells[b].textContent && cells[a].textContent === cells[c].textContent) {
+            cells[a].style.backgroundColor = 'green';
+            cells[b].style.backgroundColor = 'green';
+            cells[c].style.backgroundColor = 'green';
+            gameWon = true;
+            message.textContent = `Player ${currentPlayer} wins!`;
+
+            // Apply the "winner" class to the winning cells
+            cells[a].classList.add('winner');
+            cells[b].classList.add('winner');
+            cells[c].classList.add('winner');
+
+            // Display the new game button
+            resetButton.style.display = 'block';
+            hasWinner = true;
+            break;
+        }
+    }
+
+    if (!hasWinner && moves === 9) {
+        message.textContent = "It's a draw!";
+        // Display the new game button
+        resetButton.style.display = 'block';
+        return true;
+    }
+
+    return hasWinner;
+}
+
+resetButton.addEventListener('click', resetGame);
+
+function resetGame() {
+    for (const cell of cells) {
+        cell.textContent = '';
+        cell.style.backgroundColor = '#eee';
+        cell.classList.remove('winner'); // Remove the "winner" class
+    }
+    currentPlayer = 'X';
+    moves = 0;
+    gameWon = false;
+    message.textContent = '';
+    
+    // Hide the new game button
+    resetButton.style.display = 'none';
+}
+
+resetGame();
+
+    </script>
+</body>
+</html>
